@@ -100,14 +100,14 @@ class App extends Component {
     const { loading, users, user, userRepos, name, err, alert } = this.state;
     return (
       <Router>
-        <div className="App">
+        <div className='App'>
           <Navbar />
-          <div className="container">
+          <div className='container'>
             {err && <Alert alert={alert} />}
             <Switch>
               <Route
                 exact
-                path="/"
+                path='/'
                 render={props => (
                   <Fragment>
                     <SearchBar
@@ -121,16 +121,18 @@ class App extends Component {
                   </Fragment>
                 )}
               />
-              <Route exact path="/about" component={About} />
+              <Route exact path='/about' component={About} />
               <Route
                 exact
-                path="/user/:name"
+                path='/user/:name'
                 render={props => (
                   <User
                     {...props}
                     getUser={this.getUser}
                     user={user}
                     repos={userRepos}
+                    loading={loading}
+                    id={user.id}
                   />
                 )}
               />
