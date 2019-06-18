@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const UserTile = ({ user: { avatar_url, html_url, login } }) => {
+const UserTile = ({ user: { avatar_url, login } }) => {
   return (
     <div className="card text-center">
       <img

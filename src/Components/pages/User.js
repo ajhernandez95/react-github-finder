@@ -1,11 +1,14 @@
-import React, { Fragment, useEffect } from 'react';
+import React, { Fragment, useEffect, useContext } from 'react';
+import GithubContext from '../../context/github/githubContext';
 import { Link } from 'react-router-dom';
 import Repo from '../Repo';
 import Spinner from '../Spinner';
 
-const User = ({ user, getUser, loading, repos, match }) => {
+const User = ({ loading, match }) => {
+  const githubContext = useContext(GithubContext);
   useEffect(() => {
-    getUser(match.params.name);
+    githubContext.getUser(match.params.name);
+    githubContext.getRepos(match.params.name);
     // eslint-disable-next-line
   }, []);
 
@@ -23,9 +26,9 @@ const User = ({ user, getUser, loading, repos, match }) => {
     hireable,
     followers,
     following
-  } = user;
+  } = githubContext.user;
 
-  return loading ? (
+  return githubContext.loading ? (
     <Spinner />
   ) : (
     <div>
@@ -79,7 +82,7 @@ const User = ({ user, getUser, loading, repos, match }) => {
         <span className="badge badge-success">Followers: {followers}</span>
         <span className="badge badge-primary">Following: {following}</span>
       </div>
-      {repos.map(repo => (
+      {githubContext.userRepos.map(repo => (
         <Repo
           forks={repo.forks_count}
           watchers={repo.watchers_count}

@@ -1,4 +1,4 @@
-import { SEARCH_USERS, SET_LOADING } from '../types';
+import { SEARCH_USERS, SEARCH_USER, SEARCH_REPOS, SET_LOADING } from '../types';
 
 export default (state, action) => {
   switch (action.type) {
@@ -11,6 +11,19 @@ export default (state, action) => {
       return {
         ...state,
         users: action.payload,
+        loading: false
+      };
+    case SEARCH_USER:
+      return {
+        ...state,
+        user: action.payload,
+        loading: false
+      };
+
+    case SEARCH_REPOS:
+      return {
+        ...state,
+        userRepos: action.payload,
         loading: false
       };
 

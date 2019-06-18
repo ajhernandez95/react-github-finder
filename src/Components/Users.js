@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import GithubContext from '../context/github/githubContext';
 import UserTile from './UserTile';
 
-const Users = ({ users }) => {
+const Users = () => {
+  const githubContext = useContext(GithubContext);
   return (
     <div style={userStyle}>
-      {users.map(user => (
+      {githubContext.users.map(user => (
         <UserTile key={user.id} user={user} />
       ))}
     </div>
