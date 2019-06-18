@@ -8,6 +8,8 @@ import Alert from './Components/Alert';
 import Users from './Components/Users';
 import User from './Components/pages/User';
 import About from './Components/pages/About';
+
+import GithubState from './context/github/GithubState';
 import './styles/styles.css';
 
 const App = () => {
@@ -15,25 +17,10 @@ const App = () => {
   const [users, setUsers] = useState([]);
   const [user, setUser] = useState({});
   const [userRepos, setRepos] = useState([]);
-  const [name, setName] = useState('');
   const [err, setErr] = useState(false);
   const [alert, setAlert] = useState(null);
 
-  const handleSubmit = async e => {
-    e.preventDefault();
-    if (name === '') {
-      setErr(true);
-      setAlert({
-        class: 'alert alert-info',
-        msg: 'Please enter a name'
-      });
-
-      setTimeout(() => {
-        setErr(false);
-        setAlert(null);
-      }, 3000);
-      return;
-    }
+  const getUsers = async name => {
     setLoading(true);
 
     const res = await axios.get(
@@ -42,29 +29,8 @@ const App = () => {
       }&client_app_secret=${process.env.REACT_APP_CLIENT_SECRET}`
     );
 
-    if (res.data.items.length === 0) {
-      setLoading(false);
-      setName('');
-      setErr(true);
-      setAlert({
-        class: 'alert alert-info',
-        msg: 'No users found...'
-      });
-      setUsers([]);
-
-      setTimeout(() => {
-        setErr(false);
-        setAlert({
-          err: false,
-          alert: null
-        });
-      }, 3000);
-      return;
-    } else {
-      setLoading(false);
-      setErr(false);
-      setUsers(res.data.items);
-    }
+    setLoading(false);
+    setUsers(res.data.items);
   };
 
   const getUser = async name => {
@@ -82,57 +48,52 @@ const App = () => {
     setRepos(repos.data);
   };
 
-  const handleChange = e => {
-    setName(e.target.value);
-  };
-
   const clear = () => {
     setUsers([]);
-    setName('');
   };
 
   return (
-    <Router>
-      <div className="App">
-        <Navbar />
-        <div className="container">
-          {err && <Alert alert={alert} />}
-          <Switch>
-            <Route
-              exact
-              path="/"
-              render={props => (
-                <Fragment>
-                  <SearchBar
-                    name={name}
-                    handleChange={handleChange}
-                    handleSubmit={handleSubmit}
-                    clear={clear}
-                    isShown={users.length > 0 && true}
+    <GithubState>
+      <Router>
+        <div className='App'>
+          <Navbar />
+          <div className='container'>
+            {err && <Alert alert={alert} />}
+            <Switch>
+              <Route
+                exact
+                path='/'
+                render={props => (
+                  <Fragment>
+                    <SearchBar
+                      getUsers={getUsers}
+                      clear={clear}
+                      isShown={users.length > 0 && true}
+                    />
+                    {loading ? <Spinner /> : <Users users={users} />}
+                  </Fragment>
+                )}
+              />
+              <Route exact path='/about' component={About} />
+              <Route
+                exact
+                path='/user/:name'
+                render={props => (
+                  <User
+                    key={user.id}
+                    {...props}
+                    getUser={getUser}
+                    user={user}
+                    repos={userRepos}
+                    loading={loading}
                   />
-                  {loading ? <Spinner /> : <Users users={users} />}
-                </Fragment>
-              )}
-            />
-            <Route exact path="/about" component={About} />
-            <Route
-              exact
-              path="/user/:name"
-              render={props => (
-                <User
-                  key={user.id}
-                  {...props}
-                  getUser={getUser}
-                  user={user}
-                  repos={userRepos}
-                  loading={loading}
-                />
-              )}
-            />
-          </Switch>
+                )}
+              />
+            </Switch>
+          </div>
         </div>
-      </div>
-    </Router>
+      </Router>
+    </GithubState>
   );
 };
 
