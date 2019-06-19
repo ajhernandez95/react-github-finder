@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import Repo from '../Repo';
 import Spinner from '../Spinner';
 
-const User = ({ loading, match }) => {
+const User = ({ match }) => {
   const githubContext = useContext(GithubContext);
   useEffect(() => {
     githubContext.getUser(match.params.name);
@@ -84,6 +84,7 @@ const User = ({ loading, match }) => {
       </div>
       {githubContext.userRepos.map(repo => (
         <Repo
+          key={repo.id}
           forks={repo.forks_count}
           watchers={repo.watchers_count}
           name={repo.name}
