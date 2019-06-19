@@ -2,7 +2,23 @@ import React, { useReducer } from 'react';
 import GithubContext from './githubContext';
 import GithubReducer from './githubReducer';
 import axios from 'axios';
-import { SEARCH_USERS, SEARCH_USER, SEARCH_REPOS, SET_LOADING } from '../types';
+import {
+  SEARCH_USERS,
+  SEARCH_USER,
+  SEARCH_REPOS,
+  SET_LOADING,
+  CLEAR_USERS
+} from '../types';
+
+let githubClientID, githubClientSecret;
+
+if (process.env.NODE_ENV !== 'production') {
+  githubClientID = process.env.REACT_APP_GITHUB_CLIENT_ID;
+  githubClientSecret = process.env.REACT_APP_GITHUB_CLIENT_SECRET;
+} else {
+  githubClientID = process.env.GITHUB_CLIENT_ID;
+  githubClientSecret = process.env.GITHUB_CLIENT_SECRET;
+}
 
 const GithubState = props => {
   const initialState = {
@@ -21,9 +37,7 @@ const GithubState = props => {
     setLoading();
 
     const res = await axios.get(
-      `https://api.github.com/search/users?q=${name}&client_app_id=${
-        process.env.REACT_APP_CLIENT_ID
-      }&client_app_secret=${process.env.REACT_APP_CLIENT_SECRET}`
+      `https://api.github.com/search/users?q=${name}&client_app_id=${githubClientID}&client_app_secret=${githubClientSecret}`
     );
 
     dispatch({ type: SEARCH_USERS, payload: res.data.items });
@@ -33,9 +47,7 @@ const GithubState = props => {
     setLoading();
 
     const res = await axios.get(
-      `https://api.github.com/users/${name}?client_app_id=${
-        process.env.REACT_APP_CLIENT_ID
-      }&client_app_secret=${process.env.REACT_APP_CLIENT_SECRET}`
+      `https://api.github.com/users/${name}?client_app_id=${githubClientID}&client_app_secret=${githubClientSecret}`
     );
 
     dispatch({ type: SEARCH_USER, payload: res.data });
@@ -45,15 +57,15 @@ const GithubState = props => {
     setLoading();
 
     const repos = await axios.get(
-      `https://api.github.com/users/${name}/repos?per_page=10&client_app_id=${
-        process.env.REACT_APP_CLIENT_ID
-      }&client_app_secret=${process.env.REACT_APP_CLIENT_SECRET}`
+      `https://api.github.com/users/${name}/repos?per_page=10&client_app_id=${githubClientID}&client_app_secret=${githubClientSecret}`
     );
 
     dispatch({ type: SEARCH_REPOS, payload: repos.data });
   };
 
   const setLoading = () => dispatch({ type: SET_LOADING });
+
+  const clearUsers = () => dispatch({ type: CLEAR_USERS });
   return (
     <GithubContext.Provider
       value={{
@@ -66,7 +78,8 @@ const GithubState = props => {
         alert: state.alert,
         getUsers,
         getUser,
-        getRepos
+        getRepos,
+        clearUsers
       }}
     >
       {props.children}
